@@ -1,0 +1,11 @@
+[workspace]
+channels = ["conda-forge"]
+name = "prefect3 test"
+platforms = ["linux-64"]
+
+[dependencies]
+prefect = "3.*"
+python = "<3.13"
+tiled-client = ">=0.1.6"
+prefect-docker = "*"
+databroker = "*"

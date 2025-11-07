@@ -1,9 +1,10 @@
-from prefect import task, flow
+from prefect import task, flow, get_run_logger
 from data_validation import data_validation
 
 @task
 def log_completion():
-    print("Complete")
+    logger = get_run_logger()
+    logger.info("Complete")
 
 @flow(log_prints=True)
 def end_of_run_workflow(stop_doc):
