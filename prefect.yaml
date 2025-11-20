@@ -1,4 +1,4 @@
-name: prefect-docker-pixi-tiled-tla
+name: prefect-docker-pixi-tiled-arpes
 prefect-version: 3.6.0
 
 build: null
@@ -9,14 +9,15 @@ pull:
   - prefect.deployments.steps.set_working_directory:
       directory: /repo
   - prefect.deployments.steps.git_clone:
-      repository: https://github.com/nsls2/nsls2-workflows-template.git
+      repository: https://github.com/nsls2/arpes-workflows.git
       branch: main
 
 deployments:
-  - name: tla-end-of-run-workflow-docker
+  - name: arpes-end-of-run-workflow-docker
     version: 0.1.1
     tags:
-      - tla
+      - arpes
+      - esm
       - main
     description: Deploy the updated Docker image
     entrypoint: end_of_run_workflow.py:end_of_run_workflow
@@ -26,13 +27,13 @@ deployments:
       job_variables:
         env:
           TILED_SITE_PROFILES: /nsls2/software/etc/tiled/profiles
-        image: ghcr.io/nsls2/nsls2-workflows-template:main
+        image: ghcr.io/nsls2/arpes-workflows:main
         image_pull_policy: Always
         network: slirp4netns
         volumes:
-          - /nsls2/data/tla/proposals:/nsls2/data/tla/proposals
+          - /nsls2/data/esm/proposals:/nsls2/data/esm/proposals
           - /nsls2/software/etc/tiled:/nsls2/software/etc/tiled
         container_create_kwargs:
-          userns_mode: "keep-id:uid=402xxx,gid=402xxx"  # workflow-tla:workflow-tla
+          userns_mode: "keep-id:uid=402966,gid=402966"  # workflow-esm:workflow-esm
         auto_remove: true
-      name: tla-work-pool-docker
+      name: arpes-work-pool-docker
