@@ -219,15 +219,15 @@ def data_validation_task(uid, beamline_acronym=BEAMLINE_OR_ENDSTATION):
 
     api_key = Secret.load(f"tiled-{beamline_acronym}-api-key", _sync=True).get()
     tiled_client = from_profile("nsls2", api_key=api_key)
+
     logger.info(f"Connecting to Tiled client for beamline '{beamline_acronym}'")
-    logger.info(tiled_client["arpes/migration"])
     run_client = tiled_client[f"{beamline_acronym}/migration"][uid]
+
     logger.info(f"Validating uid {uid}")
     start_time = time.monotonic()
     validate(run_client, fix_errors=True, try_reading=True, raise_on_error=False)
     elapsed_time = time.monotonic() - start_time
     logger.info(f"Finished validating data; {elapsed_time = }")
-
 
 @flow(log_prints=True)
 def data_validation_flow(uid):
