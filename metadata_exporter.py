@@ -43,7 +43,6 @@ def export_metadata_task(uid, beamline_acronym=BEAMLINE_OR_ENDSTATION):
         logger.error(f"An error occurred while copying the file: {e}")
 
     # Read the metadata from Tiled
-    start_doc = run_client.start
     primary = run_client["primary"].read(variables = ['mbs_escale_min', 'mbs_escale_max', 'mbs_num_steps', \
                 'mbs_xscale_min', 'mbs_xscale_max', 'mbs_num_slice', \
                 'mbs_pass_energy', 'mbs_lens_mode', 'mbs_acq_mode', 'mbs_dith_steps', 'mbs_width', \
@@ -92,27 +91,26 @@ def export_metadata_task(uid, beamline_acronym=BEAMLINE_OR_ENDSTATION):
 
             nxfile.entry.instrument.insertion_device=nx.NXsource()
             nxfile.entry.instrument.insertion_device.name = nx.NXfield('EPU105')
-            nxfile.entry.instrument.insertion_device.FEH = nx.NXfield(np.round(values["FEslit_h_gap_readback"],2), units='mm')
-            nxfile.entry.instrument.insertion_device.FEV = nx.NXfield(np.round(values["FEslit_v_gap_readback"],2), units='mm')
-            # TODO: for fields below, change variable to readbacks when available (or confirm they are the same)
-            nxfile.entry.instrument.insertion_device.gap_105 = nx.NXfield(np.round(values["EPU105_gap"],2), units='mm')   # TODO: change to readback?
-            nxfile.entry.instrument.insertion_device.phase_105 = nx.NXfield(np.round(values["EPU105_phase"],2), units='mm')   # TODO: change to readback?
-            nxfile.entry.instrument.insertion_device.gap_57 = nx.NXfield(np.round(values["EPU57_gap"],2), units='mm')   # TODO: change to readback?
-            nxfile.entry.instrument.insertion_device.phase_57 = nx.NXfield(np.round(values["EPU57_phase"],2), units='mm')   # TODO: change to readback?
+            nxfile.entry.instrument.insertion_device.FEH = nx.NXfield(np.round(values["FEslit_h_gap_readback"],2), units='mm')   # PV:FE:C21A-OP{Slt:12-Ax:X}t2.C
+            nxfile.entry.instrument.insertion_device.FEV = nx.NXfield(np.round(values["FEslit_v_gap_readback"],2), units='mm')   # PV:FE:C21A-OP{Slt:12-Ax:Y}t2.C
+            nxfile.entry.instrument.insertion_device.gap_105 = nx.NXfield(np.round(values["EPU105_gap"],2), units='mm')   # PV:SR:C21-ID:G1B{EPU:2-Ax:Gap}Mtr.RBV
+            nxfile.entry.instrument.insertion_device.phase_105 = nx.NXfield(np.round(values["EPU105_phase"],2), units='mm')   # PV:SR:C21-ID:G1B{EPU:2-Ax:Phase}Mtr.RBV
+            nxfile.entry.instrument.insertion_device.gap_57 = nx.NXfield(np.round(values["EPU57_gap"],2), units='mm')   # PV:SR:C21-ID:G1A{EPU:1-Ax:Gap}Mtr.RBV
+            nxfile.entry.instrument.insertion_device.phase_57 = nx.NXfield(np.round(values["EPU57_phase"],2), units='mm')   # PV:SR:C21-ID:G1A{EPU:1-Ax:Phase}Mtr.RBV
             nxfile.entry.instrument.monochromator=nx.NXmonochromator()
             nxfile.entry.instrument.monochromator.grating=nx.NXfield(values["PGM_Grating_lines"], units='lines/mm')
-            nxfile.entry.instrument.monochromator.energy=nx.NXfield(np.round(values["PGM_Energy"],4), units='eV')  # TODO: change to readback?
-            nxfile.entry.instrument.monochromator.h_gap=nx.NXfield(np.round(values["ExitSlitA_h_gap"],1), units='um')  # TODO: change to readback?
-            nxfile.entry.instrument.monochromator.v_gap=nx.NXfield(np.round(values["ExitSlitA_v_gap"],1), units='um')  # TODO: change to readback?
+            nxfile.entry.instrument.monochromator.energy=nx.NXfield(np.round(values["PGM_Energy"],4), units='eV')  # PV:XF:21IDB-OP{Mono:1-Ax:8_Eng}Mtr.RBV
+            nxfile.entry.instrument.monochromator.h_gap=nx.NXfield(np.round(values["ExitSlitA_h_gap"],1), units='um')  # PV:XF:21IDC-OP{Slt:1A-Ax:A1_HG}Mtr.RBV
+            nxfile.entry.instrument.monochromator.v_gap=nx.NXfield(np.round(values["ExitSlitA_v_gap"],1), units='um')  # PV:XF:21IDC-OP{Slt:1A-Ax:A1_VG}Mtr.RBV
 
             nxfile.entry.instrument.manipulator=nx.NXpositioner()
             nxfile.entry.instrument.manipulator.type=nx.NXfield('6dof-xyzRxRyRz')
-            nxfile.entry.instrument.manipulator.pos_x=nx.NXfield(np.round(values["LT_X"],4),units='mm')  # TODO: change to readback?
-            nxfile.entry.instrument.manipulator.pos_y=nx.NXfield(np.round(values["LT_Y"],4),units='mm')  # TODO: change to readback?
-            nxfile.entry.instrument.manipulator.pos_z=nx.NXfield(np.round(values["LT_Z"],4),units='mm')  # TODO: change to readback?
-            nxfile.entry.instrument.manipulator.pos_Rx=nx.NXfield(np.round(values["LT_Rx"],2),units='degree')  # TODO: change to readback?
-            nxfile.entry.instrument.manipulator.pos_Ry=nx.NXfield(np.round(values["LT_Ry"],2),units='degree')  # TODO: change to readback?
-            nxfile.entry.instrument.manipulator.pos_Rz=nx.NXfield(np.round(values["LT_Rz"],2),units='degree')  # TODO: change to readback?
+            nxfile.entry.instrument.manipulator.pos_x=nx.NXfield(np.round(values["LT_X"],4),units='mm')  # PV:XF:21IDD-ES{PRV-Ax:X}Mtr.RBV
+            nxfile.entry.instrument.manipulator.pos_y=nx.NXfield(np.round(values["LT_Y"],4),units='mm')  # PV:XF:21IDD-ES{PRV-Ax:Y}Mtr.RBV
+            nxfile.entry.instrument.manipulator.pos_z=nx.NXfield(np.round(values["LT_Z"],4),units='mm')  # PV:XF:21IDD-ES{PRV-Ax:Z}Mtr.RBV
+            nxfile.entry.instrument.manipulator.pos_Rx=nx.NXfield(np.round(values["LT_Rx"],2),units='degree')  # PV:XF:21IDD-ES{PRV-Ax:R3}Mtr.RBV
+            nxfile.entry.instrument.manipulator.pos_Ry=nx.NXfield(np.round(values["LT_Ry"],2),units='degree')  # PV:XF:21IDD-ES{PRV-Ax:R1}Mtr.RBV
+            nxfile.entry.instrument.manipulator.pos_Rz=nx.NXfield(np.round(values["LT_Rz"],2),units='degree')  # PV:XF:21IDD-ES{PRV-Ax:R2}Mtr.RBV
             # nxfile.entry.instrument.manipulator.D1=nx.NXfield(EpicsSignal('XF:21IDD-ES{PS:Heat3}D1_RB').get(),units='K')
             # nxfile.entry.instrument.manipulator.D2=nx.NXfield(EpicsSignal('XF:21IDD-ES{PS:Heat3}D2_RB').get(),units='K')
             # nxfile.entry.instrument.manipulator.Stinger=nx.NXfield(EpicsSignal('XF:21ID1-ES{TCtrl:2-Chan:A}T-I').get(),units='K')
