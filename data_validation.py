@@ -86,6 +86,8 @@ def validate(root_client, fix_errors=True, try_reading=True, raise_on_error=Fals
                 msg = title + f" failed with error: {msg}"
                 logger.warning(msg)
                 notes.append(msg)
+                if raise_on_error:
+                    raise e
 
             # Validate reading of the data
             if try_reading:
