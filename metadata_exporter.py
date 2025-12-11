@@ -30,22 +30,19 @@ def export_metadata_task(uid, beamline_acronym=BEAMLINE_OR_ENDSTATION):
         logger.info(f"Found data file at {fpath_orig}, proceeding with metadata export.")
     else:
         logger.error(f"Data file not found at {fpath_orig}, aborting metadata export.")
-        return
+        raise FileNotFoundError(f"Data file not found at {fpath_orig}")
     
     # Copy the file to the destination directory and update the fpath variable
     # For example:
     # /nsls2/data3/esm/proposals/commissioning/pass-319467/assets/mbs/2025/12/11/sample_name/TEST_0002.nxs
     # /nsls2/data3/esm/proposals/commissioning/pass-319467/export/2025_12_11/sample_name/TEST_0002.nxs
-    try:
-        prefix, suffix = str(fpath_orig).split('assets')
-        suffix = suffix.split('/', 2)[-1].replace('/', '_', 2)
-        fpath_dest = Path(prefix) / 'export' / suffix
-        Path(fpath_dest).parent.mkdir(parents=True, exist_ok=True)
+    prefix, suffix = str(fpath_orig).split('assets')
+    suffix = suffix.split('/', 2)[-1].replace('/', '_', 2)
+    fpath_dest = Path(prefix) / 'export' / suffix
+    Path(fpath_dest).parent.mkdir(parents=True, exist_ok=True)
 
-        shutil.copy(fpath_orig, fpath_dest)
-        logger.info(f"File '{fpath_orig}' copied successfully to '{fpath_dest}'")
-    except Exception as e:
-        logger.error(f"An error occurred while copying the file: {e}")
+    shutil.copy(fpath_orig, fpath_dest)
+    logger.info(f"File '{fpath_orig}' copied successfully to '{fpath_dest}'")
 
     # Read the metadata from Tiled
     primary = run_client["primary"].read(variables = ['mbs_escale_min', 'mbs_escale_max', 'mbs_num_steps', \
