@@ -45,18 +45,21 @@ def export_metadata_task(uid, beamline_acronym=BEAMLINE_OR_ENDSTATION):
     logger.info(f"File '{fpath_orig}' copied successfully to '{fpath_dest}'")
 
     # Read the metadata from Tiled
-    primary = run_client["primary"].read(variables = ['mbs_escale_min', 'mbs_escale_max', 'mbs_num_steps', \
-                'mbs_xscale_min', 'mbs_xscale_max', 'mbs_num_slice', \
-                'mbs_pass_energy', 'mbs_lens_mode', 'mbs_acq_mode', 'mbs_dith_steps', 'mbs_width', \
-                'mbs_center_ke', 'mbs_start_ke', 'mbs_end_ke', 'mbs_step_size', \
-                'mbs_act_scans', 'mbs_psu_mode', 'mbs_num_slice', 'mbs_num_steps', 'mbs_frames'])
+    primary = run_client["primary"].read(variables = ['mbs_psu_mode', 'mbs_dith_steps', 'mbs_act_scans']).tail(1)
     baseline = run_client["baseline"].read(variables=['FEslit_h_gap_readback', 'FEslit_v_gap_readback', \
                 'EPU105_gap', 'EPU105_phase', 'EPU57_gap', 'EPU57_phase',
                 'PGM_Grating_lines', 'PGM_Energy', 'ExitSlitA_h_gap', 'ExitSlitA_v_gap',
                 'LT_X', 'LT_Y', 'LT_Z', 'LT_Rx', 'LT_Ry', 'LT_Rz', 'D1', 'D2', 'Stinger'
                 ]).tail(1)
-    values = {k: v.values[0] for k, v in primary.data_vars.items()} \
-        | {k: v.item() for k, v in baseline.data_vars.items()}
+    config_data = run_client['primary'].metadata['configuration']['mbs']['data']
+    config_keys = ['mbs_escale_min', 'mbs_escale_max', 'mbs_num_steps', \
+                'mbs_xscale_min', 'mbs_xscale_max', 'mbs_num_slice', \
+                'mbs_pass_energy', 'mbs_lens_mode', 'mbs_acq_mode', 'mbs_width', \
+                'mbs_center_ke', 'mbs_start_ke', 'mbs_end_ke', 'mbs_step_size', \
+                'mbs_num_slice', 'mbs_num_steps', 'mbs_frames']
+    values = {k: v.item() for k, v in primary.data_vars.items()} \
+        | {k: v.item() for k, v in baseline.data_vars.items()} \
+        | {k: config_data[k] for k in config_keys}
 
     # Add metadata to new (copied) NeXus file
     with nx.nxload(fpath_dest, 'rw') as nxfile:
