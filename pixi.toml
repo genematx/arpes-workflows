@@ -5,9 +5,8 @@ platforms = ["linux-64"]
 
 [dependencies]
 prefect = "3.*"
-python = "<3.13"
-tiled-client = ">=0.2.1"
+python = "<3.14"
+tiled-client = ">=0.2.3"
 prefect-docker = "*"
-databroker = "*"
-bluesky-tiled-plugins = "*"
+bluesky-tiled-plugins = ">=2"
 nexusformat = "*"
