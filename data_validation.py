@@ -215,7 +215,7 @@ def validate_structure(data_client, fix_errors=False) -> list[str]:
     return notes
 
 
-@task(retries=2, retry_delay_seconds=10)
+@task(retries=3, retry_delay_seconds=20)
 def data_validation_task(uid, beamline_acronym=BEAMLINE_OR_ENDSTATION):
     logger = get_run_logger()
 
