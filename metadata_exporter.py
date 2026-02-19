@@ -109,8 +109,24 @@ def export_metadata_task(run_client):
         nxfile.entry.instrument.manipulator.Stinger=nx.NXfield(np.round(values["Stinger"],2),units='K')  # XF:21ID1-ES{TCtrl:2-Chan:A}T-I
         nxfile.entry.instrument.manipulator.sample_bias=nx.NXfield(0, units='V')
 
+        user_note = str(run_client.start.get("user_note", ""))
         nxfile.entry.note = nx.NXnote()
-        nxfile.entry.note.description = nx.NXfield(str(run_client.start.get("user_note", "")))
+        nxfile.entry.note.description = nx.NXfield(user_note)
+
+        # Custom metadata for XY scans only -- include arrays of scanned positions
+        if (user_note == "XY scan") and (run_client.start.get("plan_name") == "grid_scan"):
+            # Parse plan arguments, `(motor_1, start_1, stop_1, num_1, motor_2, start_2, stop_2, num_2, ...)`
+            plan_args = run_client.start['plan_args']['args']
+            x_linear_grid = np.round(np.linspace(plan_args[1], plan_args[2], plan_args[3]), 4)
+            y_linear_grid = np.round(np.linspace(plan_args[5], plan_args[6], plan_args[7]), 4)
+            # If the first motor is Y, swap the order of the grids
+            if "LT_Y" in plan_args[0] and "LT_X" in plan_args[4]:
+                x_linear_grid, y_linear_grid = y_linear_grid, x_linear_grid
+            nxfile.entry.instrument.manipulator.pos_x = nx.NXfield(x_linear_grid, units='mm')
+            nxfile.entry.instrument.manipulator.pos_y = nx.NXfield(y_linear_grid, units='mm')
+            # Keep the lists of actual positions
+            nxfile.entry.instrument.manipulator.pos_act_x=nx.NXfield(np.round(values["LT_X"],4),units='mm')  # PV:XF:21IDD-ES{PRV-Ax:X}Mtr.RBV
+            nxfile.entry.instrument.manipulator.pos_act_y=nx.NXfield(np.round(values["LT_Y"],4),units='mm')  # PV:XF:21IDD-ES{PRV-Ax:Y}Mtr.RBV
 
     elapsed_time = time.monotonic() - start_time
     logger.info(f"Finished exporting metadata; {elapsed_time = }")
